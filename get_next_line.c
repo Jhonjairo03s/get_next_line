@@ -12,34 +12,90 @@
 
 #include "get_next_line.h"
 
-char	*get_next_line(int fd)
-{
+static char	*ft_read_and_concatenate(int fd, char *remainder)
+{	
 	char	buffer[BUFFER_SIZE + 1];
 	int		bytes_read;
-	char	*ptr;
-	char	*line;
-	int		len;
+	char	*temp;
 
 	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	buffer[BUFFER_SIZE] = '\0';
-	if (bytes_read == 0 || bytes_read == -1)
+	if (bytes_read <= 0)
 	{
 		return (NULL);
 	}
-	ptr = buffer;
+	buffer[bytes_read] = '\0';
+	if (remainder != NULL)
+	{
+		temp = ft_strjoin(remainder, buffer);
+		free(remainder);
+		remainder = temp;
+	}
+	else
+	{
+		remainder = ft_strdup(buffer);
+	}
+	return (remainder);
+}
+
+static char	*ft_extract_line(char *remainder, int *len)
+{
+	char	*ptr;
+	char	*line;
+
+	ptr = remainder;
 	while (*ptr != '\n' && *ptr != '\0')
 	{
 		ptr++;
 	}
-	len = ptr - buffer;
-	line = malloc(sizeof(char) * (len + 1));
+	*len = ptr - remainder;
+	line = malloc(sizeof(char) * (*len + 1));
 	if (line == NULL)
 	{
 		return (NULL);
 	}
-	ft_strncpy(line, buffer, len);
-	line[len] = '\0';
-	ft_memmove(buffer, ptr + 1, ft_strlen(ptr + 1) + 1);
+	ft_strncpy(line, remainder, *len);
+	line[(*len)] = '\0';
 	return (line);
-	free(line);
+}
+
+static char	ft_adjust_remainder(char *remainder, char *ptr)
+{
+	char	*temp;
+
+	if (*ptr == '\n')
+	{
+		ptr++;
+	}
+	temp = ft_strdup(ptr);
+	free(remainder);
+	return (temp);
+}
+
+char	*get_next_line(int fd)
+{
+	int		len;
+	static char	*remainder = NULL;
+	char	*ptr;
+	char	*line;
+	char	*temp;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	remainder = ft_read_and_concatenate(fd, remainder);
+	if (remainder == NULL)
+		return (NULL);
+	line = ft_extract_line(remainder, &len);
+	if (line == NULL)
+	{
+		free(remainder);
+		remainder = NULL;
+		return (NULL);
+	}
+	ptr = remainder;
+	while (*ptr != '\n' && *ptr != '\0')
+		ptr++;
+	remainder = ft_adjust_remainder(remainder, ptr);
+	if (line != NULL)
+		free(line);
+	return (line);
 }

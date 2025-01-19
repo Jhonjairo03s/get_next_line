@@ -26,23 +26,6 @@ static char	*ft_strncpy(char *dest, const char *origen, size_t len)
 	return (dest);
 }
 
-static void	*ft_memmove(void *dest, const void *origen, size_t len)
-{
-	unsigned char				*d;
-	const unsigned char			*o;
-	size_t						counter;
-
-	d = (unsigned char *)dest;
-	o = (const unsigned char *)origen;
-	counter = 0;
-	while (counter < len)
-	{
-		d[counter] = o[counter];
-		counter++;
-	}
-	return (dest);
-}
-
 static size_t	ft_strlen(const char *str)
 {
 	int	counter;
@@ -84,4 +67,20 @@ static char	*ft_strjoin(char const *str1, char const *str2)
 	}
 	joined_str[sizetotal] = '\0';
 	return (joined_str);
+}
+
+static char	*ft_strdup(const char *str)
+{
+	size_t	len;
+	char	*dest;
+
+	len = ft_strlen(str);
+	dest = malloc(sizeof(char) * (len + 1));
+	if (dest == NULL)
+	{
+		return (NULL);
+	}
+	ft_strncpy(dest, str, len);
+	dest[len] = '\0';
+	return (dest);
 }
