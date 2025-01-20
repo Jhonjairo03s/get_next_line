@@ -6,14 +6,14 @@
 /*   By: jhvalenc <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 17:18:27 by jhvalenc          #+#    #+#             */
-/*   Updated: 2025/01/17 19:58:38 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2025/01/20 18:01:27 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 static char	*ft_read_and_concatenate(int fd, char *remainder)
-{	
+{
 	char	buffer[BUFFER_SIZE + 1];
 	int		bytes_read;
 	char	*temp;
@@ -73,11 +73,11 @@ static char	ft_adjust_remainder(char *remainder, char *ptr)
 
 char	*get_next_line(int fd)
 {
-	int		len;
+	int			len;
 	static char	*remainder = NULL;
-	char	*ptr;
-	char	*line;
-	char	*temp;
+	char		*ptr;
+	char		*line;
+	char		*temp;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
