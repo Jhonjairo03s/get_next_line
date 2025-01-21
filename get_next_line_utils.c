@@ -12,9 +12,9 @@
 
 #include "get_next_line.h"
 
-static char	*ft_strncpy(char *dest, const char *origen, size_t len)
+char	*ft_strncpy(char *dest, const char *origen, size_t len)
 {
-	int	counter;
+	size_t	counter;
 
 	counter = 0;
 	while (origen[counter] != '\0' && counter < len)
@@ -26,7 +26,7 @@ static char	*ft_strncpy(char *dest, const char *origen, size_t len)
 	return (dest);
 }
 
-static size_t	ft_strlen(const char *str)
+size_t	ft_strlen(const char *str)
 {
 	int	counter;
 
@@ -38,9 +38,9 @@ static size_t	ft_strlen(const char *str)
 	return (counter);
 }
 
-static char	*ft_strjoin(char const *str1, char const *str2)
+char	*ft_strjoin(char const *str1, char const *str2)
 {
-	int			sizetotal;
+	size_t			sizetotal;
 	size_t		counter_s1;
 	size_t		counter_s2;
 	char		*joined_str;
@@ -69,7 +69,7 @@ static char	*ft_strjoin(char const *str1, char const *str2)
 	return (joined_str);
 }
 
-static char	*ft_strdup(const char *str)
+char	*ft_strdup(const char *str)
 {
 	size_t	len;
 	char	*dest;

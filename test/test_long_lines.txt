@@ -1,0 +1,2 @@
+Esta es una línea muy larga que ocupa más de un buffer.
+Esta es otra línea muy larga que también ocupa más de un buffer.

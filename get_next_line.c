@@ -48,6 +48,10 @@ static char	*ft_extract_line(char *remainder, int *len)
 		ptr++;
 	}
 	*len = ptr - remainder;
+	if (*ptr == '\n')
+	{
+		(*len)++;
+	}
 	line = malloc(sizeof(char) * (*len + 1));
 	if (line == NULL)
 	{
@@ -58,7 +62,7 @@ static char	*ft_extract_line(char *remainder, int *len)
 	return (line);
 }
 
-static char	ft_adjust_remainder(char *remainder, char *ptr)
+static char	*ft_adjust_remainder(char *remainder, char *ptr)
 {
 	char	*temp;
 
@@ -77,7 +81,6 @@ char	*get_next_line(int fd)
 	static char	*remainder = NULL;
 	char		*ptr;
 	char		*line;
-	char		*temp;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
@@ -95,7 +98,8 @@ char	*get_next_line(int fd)
 	while (*ptr != '\n' && *ptr != '\0')
 		ptr++;
 	remainder = ft_adjust_remainder(remainder, ptr);
+	return (line);
 	if (line != NULL)
 		free(line);
-	return (line);
 }
+
