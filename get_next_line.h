@@ -5,24 +5,32 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jhvalenc <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/27 17:18:37 by jhvalenc          #+#    #+#             */
-/*   Updated: 2025/01/14 19:12:04 by jhvalenc         ###   ########.fr       */
+/*   Created: 2025/01/31 12:48:38 by jhvalenc          #+#    #+#             */
+/*   Updated: 2025/02/06 16:01:09 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-# include <fcntl.h> // necesario para `open`
-# include <stdio.h> // necesario para `printf`
-# include <stdlib.h> // necesario para 'free' y 'malloc'
-# include <unistd.h> // necesario para 'read'
+# include <stdlib.h>
+# include <unistd.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
 
+# endif
+
+// Prototipos de get_next_line.c
 char	*get_next_line(int fd);
-char	*ft_strncpy(char *dest, const char *origen, size_t len);
-size_t	ft_strlen(const char *str);
-char	*ft_strjoin(char const *str1, char const *str2);
-char	*ft_strdup(const char *str);
+char	*read_and_store(int fd, char **stash);
+char	*extract_line(char **stash);
+char	*update_stash(char **stash);
+
+// Protoripos de get_next_line_utils.c
+char	*find_newline(char *stash);
+size_t	string_length(const char *str);
+char	*string_join(char *str1, char *str2);
+char	*string_sub(char *str, unsigned int start, size_t len);
 
 #endif

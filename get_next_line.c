@@ -5,101 +5,106 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jhvalenc <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/27 17:18:27 by jhvalenc          #+#    #+#             */
-/*   Updated: 2025/01/20 18:01:27 by jhvalenc         ###   ########.fr       */
+/*   Created: 2025/01/31 12:48:29 by jhvalenc          #+#    #+#             */
+/*   Updated: 2025/02/06 16:32:44 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	*ft_read_and_concatenate(int fd, char *remainder)
+static char	*read_until_newline(int fd, char **stash, char *buffer)
 {
-	char	buffer[BUFFER_SIZE + 1];
 	int		bytes_read;
 	char	*temp;
 
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (bytes_read <= 0)
+	while (find_newline(*stash) == NULL)
 	{
-		return (NULL);
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read == -1)
+			return (NULL);
+		if (bytes_read == 0)
+			break ;
+		buffer[bytes_read] = '\0';
+		temp = string_join(*stash, buffer);
+		if (temp == NULL)
+			return (NULL);
+		free(*stash);
+		*stash = temp;
 	}
-	buffer[bytes_read] = '\0';
-	if (remainder != NULL)
-	{
-		temp = ft_strjoin(remainder, buffer);
-		free(remainder);
-		remainder = temp;
-	}
-	else
-	{
-		remainder = ft_strdup(buffer);
-	}
-	return (remainder);
+	return (*stash);
 }
 
-static char	*ft_extract_line(char *remainder, int *len)
+char	*read_and_store(int fd, char **stash)
 {
-	char	*ptr;
-	char	*line;
+	char	*buffer;
+	char	*result;
 
-	ptr = remainder;
-	while (*ptr != '\n' && *ptr != '\0')
-	{
-		ptr++;
-	}
-	*len = ptr - remainder;
-	if (*ptr == '\n')
-	{
-		(*len)++;
-	}
-	line = malloc(sizeof(char) * (*len + 1));
-	if (line == NULL)
-	{
+	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (buffer == NULL)
 		return (NULL);
-	}
-	ft_strncpy(line, remainder, *len);
-	line[(*len)] = '\0';
+	result = read_until_newline(fd, stash, buffer);
+	free(buffer);
+	return (result);
+}
+
+char	*extract_line(char **stash)
+{
+	char	*line;
+	size_t	line_length;
+	char	*newline_ptr;
+
+	if (*stash == NULL || **stash == '\0')
+		return (NULL);
+	newline_ptr = find_newline(*stash);
+	if (newline_ptr != NULL)
+		line_length = newline_ptr - *stash + 1;
+	else
+		line_length = string_length(*stash);
+	line = string_sub(*stash, 0, line_length);
+	if (line == NULL)
+		return (NULL);
 	return (line);
 }
 
-static char	*ft_adjust_remainder(char *remainder, char *ptr)
+char	*update_stash(char **stash)
 {
-	char	*temp;
+	char	*new_stash;
+	size_t	start;
+	char	*newline_ptr;
 
-	if (*ptr == '\n')
+	newline_ptr = find_newline(*stash);
+	if (newline_ptr == NULL)
 	{
-		ptr++;
+		free(*stash);
+		*stash = NULL;
+		return (NULL);
 	}
-	temp = ft_strdup(ptr);
-	free(remainder);
-	return (temp);
+	start = newline_ptr - *stash + 1;
+	new_stash = string_sub(*stash, start, string_length(*stash) - start);
+	if (new_stash == NULL)
+		return (NULL);
+	free(*stash);
+	*stash = new_stash;
+	return (*stash);
 }
 
 char	*get_next_line(int fd)
 {
-	int			len;
-	static char	*remainder = NULL;
-	char		*ptr;
+	static char	*stash = NULL;
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	remainder = ft_read_and_concatenate(fd, remainder);
-	if (remainder == NULL)
+	stash = read_and_store(fd, &stash);
+	if (stash == NULL)
 		return (NULL);
-	line = ft_extract_line(remainder, &len);
+	line = extract_line(&stash);
 	if (line == NULL)
 	{
-		free(remainder);
-		remainder = NULL;
+		free(stash);
+		stash = NULL;
 		return (NULL);
 	}
-	ptr = remainder;
-	while (*ptr != '\n' && *ptr != '\0')
-		ptr++;
-	remainder = ft_adjust_remainder(remainder, ptr);
+	stash = update_stash(&stash);
 	return (line);
-	if (line != NULL)
-		free(line);
 }
-
